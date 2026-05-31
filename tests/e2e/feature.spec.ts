@@ -26,10 +26,31 @@ test("current pitcher's pitch syncs + audience react syncs back", async ({ brows
     await pitcher.getByRole("button", { name: "drop pitch", exact: true }).click();
     await audience.waitForTimeout(400);
 
+    // Cross-peer #1: the pitch text propagates pitcher → audience.
     await expect(audience.locator(".pitch-feed")).toContainText("agents everywhere");
+
+    // The pitch row's rocket tally on the PITCHER starts at 0 (load-bearing:
+    // 🚀 is always rendered, so we assert the COUNT, not the emoji).
+    const pitcherRocketTally = pitcher
+      .locator(".pitch-feed-row")
+      .first()
+      .locator(".pitch-tally")
+      .first();
+    await expect(pitcherRocketTally).toHaveText(/🚀\s*0/);
+
+    // Cross-peer #2: audience reacts rocket; the count must propagate back to
+    // the OPPOSITE peer (the pitcher) and land on the leaderboard.
     await audience.getByRole("button", { name: "react rocket", exact: true }).first().click();
-    await pitcher.waitForTimeout(400);
-    await expect(pitcher.locator(".pitch-feed")).toContainText("🚀");
+    await expect(pitcherRocketTally).toHaveText(/🚀\s*1/);
+    await expect(
+      pitcher.locator(".mesh-leaderboard-row").first().locator(".mesh-leaderboard-score"),
+    ).toHaveText("1");
+
+    // And idempotency: a second react from the same audience peer (toggle off)
+    // brings the pitcher's count back to 0 — proving it's a real synced count,
+    // not a stuck local increment.
+    await audience.getByRole("button", { name: "react rocket", exact: true }).first().click();
+    await expect(pitcherRocketTally).toHaveText(/🚀\s*0/);
   } finally {
     await cleanup();
   }
