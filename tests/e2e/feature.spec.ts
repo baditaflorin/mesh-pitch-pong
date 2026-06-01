@@ -17,10 +17,22 @@ test("current pitcher's pitch syncs + audience react syncs back", async ({ brows
     await a.getByRole("button", { name: "start", exact: true }).click();
     await a.waitForTimeout(500);
 
-    // figure out whose turn it is on A
-    const banner = (await a.locator(".pitch-current").innerText()).toLowerCase();
-    const pitcher = banner.includes("alice") ? a : b;
-    const audience = banner.includes("alice") ? b : a;
+    // Cross-peer #0: the rotating turn is derived identically on both peers
+    // from the synced roster + mesh clock. The "on the mic" name (read from
+    // `.pitch-current-name`, NOT the whole banner — which also carries the
+    // "next:" name) must MATCH across both peers. If the turn were computed
+    // from local-only state the two screens could disagree.
+    const onMicA = (await a.locator(".pitch-current-name").innerText()).trim().toLowerCase();
+    const onMicB = (await b.locator(".pitch-current-name").innerText()).trim().toLowerCase();
+    expect(onMicA).toBe(onMicB);
+    expect(["alice", "bob"]).toContain(onMicA);
+    // Both peers also surface the same "next:" peer (the round-robin order is
+    // shared, not local). With two peers, next is whoever isn't on the mic.
+    await expect(a.locator(".pitch-current-next")).toBeVisible();
+    await expect(b.locator(".pitch-current-next")).toBeVisible();
+
+    const pitcher = onMicA === "alice" ? a : b;
+    const audience = onMicA === "alice" ? b : a;
 
     await pitcher.getByPlaceholder("pitch your idea").fill("agents everywhere");
     await pitcher.getByRole("button", { name: "drop pitch", exact: true }).click();
