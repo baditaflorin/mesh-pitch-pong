@@ -4,7 +4,7 @@
 [![version](https://img.shields.io/badge/version-0.1.1-blue)](https://github.com/baditaflorin/mesh-pitch-pong/blob/main/package.json)
 [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
-> Rotating peer pitches a 30s idea; audience reacts rocket/think/downvote.
+> Round-robin pitch jam: each peer gets a 30s turn on the mic to drop a one-line idea, the room reacts 🚀 / 🤔 / 👎, and rockets rank the leaderboard.
 
 **Live → https://baditaflorin.github.io/mesh-pitch-pong/**
 
@@ -27,6 +27,14 @@
 A **rootless-computing** peer-to-peer browser app. No backend of its own beyond the self-hosted WebRTC stack listed below. State lives in a Yjs mesh shared by everyone in the same room.
 
 Read the principles → **https://baditaflorin.github.io/rootless-computing/principles.html**
+
+## Try it in 30 seconds
+
+1. Open the live URL in **two browser tabs** (both default to the same room).
+2. Type a name in each tab, then hit **start** in one.
+3. One tab is "on the mic" — type a one-line pitch there and **drop** it.
+4. The other tab sees the pitch instantly; tap 🚀 / 🤔 / 👎 — the rocket count syncs back and climbs the leaderboard.
+5. Wait for the 30s timer and the mic rotates to the next peer.
 
 ## Quickstart
 

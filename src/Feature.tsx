@@ -103,6 +103,10 @@ function Body({ room, config }: { room: YRoom; config: MeshConfig }) {
   const pitcherName = turn.currentPeerId
     ? (nameOf(turn.currentPeerId) ?? `peer-${turn.currentPeerId.slice(0, 4)}`)
     : "—";
+  const nextName =
+    turn.nextPeerId && turn.nextPeerId !== turn.currentPeerId
+      ? (nameOf(turn.nextPeerId) ?? `peer-${turn.nextPeerId.slice(0, 4)}`)
+      : null;
 
   return (
     <div className="pitch-screen">
@@ -113,6 +117,13 @@ function Body({ room, config }: { room: YRoom; config: MeshConfig }) {
           {room.peerCount + 1} peers · round {slotsElapsed + 1} · {log.size} pitches
         </p>
       </header>
+      {phase.phase === "lobby" && (
+        <p className="pitch-help">
+          Take turns on the mic: each peer gets a 30-second slot to drop a one-line idea, and
+          everyone else reacts 🚀 🤔 👎. Rockets rank the leaderboard. Type a name, hit start — try
+          it with two browser tabs.
+        </p>
+      )}
       <input
         className="pitch-name"
         value={name}
@@ -138,6 +149,7 @@ function Body({ room, config }: { room: YRoom; config: MeshConfig }) {
           <span className="pitch-current-name">{pitcherName}</span>
           <span className="pitch-current-time"> · {deadline.fmt || "—"}</span>
           {turn.isMyTurn && <span className="pitch-current-you"> (you)</span>}
+          {nextName && <span className="pitch-current-next"> · next: {nextName}</span>}
         </div>
       )}
       {phase.phase === "pitching" && turn.isMyTurn && (
