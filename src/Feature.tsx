@@ -12,6 +12,7 @@ import {
   useNamedPeer,
   usePhase,
   useReactions,
+  useRoster,
   useRotatingTurn,
   type MeshConfig,
   type YRoom,
@@ -43,7 +44,8 @@ function Body({ room, config }: { room: YRoom; config: MeshConfig }) {
   const clock = useMemo(() => createClockSync(room.provider), [room]);
   useEffect(() => () => clock.destroy(), [clock]);
 
-  useFairRng(room, "pitch-salts");
+  const roster = useRoster(room);
+  useFairRng(room, "pitch-salts", { peerIds: roster.present, minContributors: 1 });
   const log = useEventLog<Pitch>(room, "pitches");
   const reactions = useReactions(room, "pitch-reactions");
   const phase = usePhase<"lobby" | "pitching" | "done">(room, "phase", "lobby");
